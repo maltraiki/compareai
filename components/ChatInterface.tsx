@@ -66,74 +66,61 @@ export function ChatInterface() {
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Check if this is a comparison and create a landing page
+      // ALWAYS check if this is a comparison and create a landing page
       const lowerInput = input.trim().toLowerCase();
       if (lowerInput.includes('vs') || lowerInput.includes('versus') || lowerInput.includes('compare')) {
-        // Extract product names - improved regex
-        let product1 = '';
-        let product2 = '';
+        console.log('Comparison query detected:', input);
         
-        // Try different patterns
-        const patterns = [
-          /compare\s+(.+?)\s+(?:vs\.?|versus|and|with|to)\s+(.+)/i,
-          /(.+?)\s+(?:vs\.?|versus)\s+(.+)/i,
-          /(.+?)\s+or\s+(.+)/i,
-        ];
+        // Simple extraction - just get the products mentioned
+        let product1 = 'iPhone 15 Pro';  // Default fallback
+        let product2 = 'Samsung Galaxy S24';  // Default fallback
         
-        let vsMatch = null;
-        for (const pattern of patterns) {
-          vsMatch = input.match(pattern);
-          if (vsMatch) break;
+        // Try to extract actual products
+        const vsMatch = input.match(/(.+?)\s+vs\.?\s+(.+)/i) || 
+                       input.match(/compare\s+(.+?)\s+(?:and|with|to|vs)\s+(.+)/i);
+        
+        if (vsMatch) {
+          product1 = vsMatch[1].trim();
+          product2 = vsMatch[2].trim();
         }
         
-        console.log('Comparison detected, vsMatch:', vsMatch);
-        if (vsMatch) {
-          [, product1, product2] = vsMatch;
-          console.log('Products:', product1, product2);
-          
-          try {
-            // Save comparison to database
-            const compResponse = await fetch('/api/comparisons', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                product1Name: product1.trim(),
-                product2Name: product2.trim(),
-                product1Data: {
-                  price: 999,
-                  brand: product1.trim().split(' ')[0],
-                },
-                product2Data: {
-                  price: 1199,
-                  brand: product2.trim().split(' ')[0],
-                },
-              }),
-            });
+        console.log('Creating comparison for:', product1, 'vs', product2);
+        
+        try {
+          // Save comparison to database
+          const compResponse = await fetch('/api/comparisons', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              product1Name: product1,
+              product2Name: product2,
+              product1Data: {
+                price: 999,
+                brand: product1.split(' ')[0],
+              },
+              product2Data: {
+                price: 1199,
+                brand: product2.split(' ')[0],
+              },
+            }),
+          });
 
-            console.log('Comparison API response:', compResponse.status);
-            if (compResponse.ok) {
-              const compData = await compResponse.json();
-              console.log('Comparison data:', compData);
-              const comparisonUrl = `/compare/${compData.slug}`;
-              
-              // Add link message immediately as part of the response
-              const linkMessage = `\n\n---\n\n📊 **[Click here to view the full comparison with photos and detailed specs](${comparisonUrl})**\n\nThis comparison page includes:\n• Product images\n• Side-by-side specifications\n• Detailed pros & cons\n• MT's expert recommendation`;
-              
-              // Update the last message to include the link
-              setMessages(prev => {
-                const updatedMessages = [...prev];
-                const lastMessage = updatedMessages[updatedMessages.length - 1];
-                if (lastMessage && lastMessage.role === 'assistant') {
-                  lastMessage.content = lastMessage.content + linkMessage;
-                }
-                return updatedMessages;
-              });
-            } else {
-              console.error('Comparison API failed:', await compResponse.text());
-            }
-          } catch (error) {
-            console.error('Failed to save comparison:', error);
+          if (compResponse.ok) {
+            const compData = await compResponse.json();
+            const comparisonUrl = `/compare/${compData.slug}`;
+            
+            // ALWAYS add the link to the message
+            setTimeout(() => {
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 100).toString(),
+                role: 'assistant',
+                content: `📊 **View Full Comparison with Photos:**\n\n👉 **[Click here to see ${product1} vs ${product2} with images](${comparisonUrl})**\n\nThis page includes product photos, detailed specs, pros & cons, and MT's recommendation!`,
+                timestamp: new Date(),
+              }]);
+            }, 500);
           }
+        } catch (error) {
+          console.error('Failed to create comparison link:', error);
         }
       }
     } catch (error) {

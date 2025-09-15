@@ -53,26 +53,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // Generate static params for known comparisons
 export async function generateStaticParams() {
-  const comparisons = await prisma.comparison.findMany({
-    select: { slug: true },
-    take: 100, // Pre-render top 100 comparisons
-  });
+  try {
+    const comparisons = await prisma.comparison.findMany({
+      select: { slug: true },
+      take: 100, // Pre-render top 100 comparisons
+    });
 
-  return comparisons.map((comparison) => ({
-    slug: comparison.slug,
-  }));
+    return comparisons.map((comparison) => ({
+      slug: comparison.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
 }
 
 export default async function ComparisonPage({ params }: PageProps) {
   const { slug } = await params;
-  // Update view count
-  await prisma.comparison.update({
-    where: { slug },
-    data: { 
-      viewCount: { increment: 1 },
-      lastViewed: new Date(),
-    },
-  });
+  
+  try {
+    // Update view count
+    await prisma.comparison.update({
+      where: { slug },
+      data: { 
+        viewCount: { increment: 1 },
+        lastViewed: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error('Error updating view count:', error);
+  }
 
   const comparison = await prisma.comparison.findUnique({
     where: { slug },

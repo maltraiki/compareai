@@ -18,31 +18,41 @@ export const metadata: Metadata = {
 };
 
 async function getPopularComparisons() {
-  const comparisons = await prisma.comparison.findMany({
-    take: 6,
-    orderBy: {
-      viewCount: 'desc',
-    },
-    include: {
-      product1: true,
-      product2: true,
-    },
-  });
-  return comparisons;
+  try {
+    const comparisons = await prisma.comparison.findMany({
+      take: 6,
+      orderBy: {
+        viewCount: 'desc',
+      },
+      include: {
+        product1: true,
+        product2: true,
+      },
+    });
+    return comparisons;
+  } catch (error) {
+    console.error('Error fetching popular comparisons:', error);
+    return [];
+  }
 }
 
 async function getRecentComparisons() {
-  const comparisons = await prisma.comparison.findMany({
-    take: 6,
-    orderBy: {
-      createdAt: 'desc',
-    },
-    include: {
-      product1: true,
-      product2: true,
-    },
-  });
-  return comparisons;
+  try {
+    const comparisons = await prisma.comparison.findMany({
+      take: 6,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        product1: true,
+        product2: true,
+      },
+    });
+    return comparisons;
+  } catch (error) {
+    console.error('Error fetching recent comparisons:', error);
+    return [];
+  }
 }
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {

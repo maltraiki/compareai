@@ -1,20 +1,14 @@
-import { ChatInterface } from '@/components/ChatInterface';
 import Link from 'next/link';
-import { TrendingUp, Users, Clock, Star, ShieldCheck, Zap, Trophy, DollarSign } from 'lucide-react';
+import { Star, ShieldCheck, Zap, Trophy, DollarSign } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'CompareAI - Your Personal Shopping Expert | Save Money on Every Purchase',
   description: 'Get instant AI-powered product comparisons from Alex, your personal shopping expert. Compare phones, laptops, tablets and save thousands. Trusted by 50,000+ happy shoppers!',
   keywords: 'product comparison, shopping expert, compare products, save money, best deals, iPhone vs Samsung, MacBook vs Dell, shopping assistant',
-  openGraph: {
-    title: 'CompareAI - Your Personal Shopping Expert',
-    description: 'Save money with AI-powered product comparisons. Your personal shopping expert is here to help!',
-    type: 'website',
-  },
 };
 
-export default async function Home() {
+export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       {/* Header */}
@@ -64,7 +58,7 @@ export default async function Home() {
           </h1>
           
           <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto font-medium">
-            Hi! I'm Alex, your personal shopping expert. I've helped 50,000+ people save money by finding the perfect products at the best prices. Let me help you make smart buying decisions!
+            Hi! I&apos;m Alex, your personal shopping expert. I&apos;ve helped 50,000+ people save money by finding the perfect products at the best prices. Let me help you make smart buying decisions!
           </p>
           
           <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -83,9 +77,18 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Chat Interface */}
+        {/* Temporary Chat Interface - Coming Soon */}
         <div className="mb-16">
-          <ChatInterface />
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Chat with Alex - Coming Soon!</h2>
+            <p className="text-gray-600 mb-6">
+              Our AI shopping assistant is being prepared for you. Check back in a few minutes!
+            </p>
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-6 py-3 rounded-lg">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="font-medium">Alex is getting ready...</span>
+            </div>
+          </div>
         </div>
 
         {/* Trust Badges */}
@@ -121,7 +124,7 @@ export default async function Home() {
                 ))}
               </div>
               <p className="text-gray-700 mb-3 font-medium">
-                "Alex helped me save $500 on my new laptop! The comparison was so detailed and easy to understand."
+                &quot;Alex helped me save $500 on my new laptop! The comparison was so detailed and easy to understand.&quot;
               </p>
               <p className="text-sm text-gray-600 font-bold">- Sarah M., Verified Buyer</p>
             </div>
@@ -132,7 +135,7 @@ export default async function Home() {
                 ))}
               </div>
               <p className="text-gray-700 mb-3 font-medium">
-                "I always check with Alex before making any tech purchase. It's like having a tech expert friend!"
+                &quot;I always check with Alex before making any tech purchase. It&apos;s like having a tech expert friend!&quot;
               </p>
               <p className="text-sm text-gray-600 font-bold">- John D., Tech Enthusiast</p>
             </div>
@@ -143,7 +146,7 @@ export default async function Home() {
                 ))}
               </div>
               <p className="text-gray-700 mb-3 font-medium">
-                "The side-by-side comparisons are amazing. Helped me choose the perfect phone for my needs."
+                &quot;The side-by-side comparisons are amazing. Helped me choose the perfect phone for my needs.&quot;
               </p>
               <p className="text-sm text-gray-600 font-bold">- Maria L., Happy Customer</p>
             </div>

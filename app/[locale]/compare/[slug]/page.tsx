@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
     },
     alternates: {
-      canonical: `/compare/${params.slug}`,
+      canonical: `/compare/${slug}`,
     },
   };
 }

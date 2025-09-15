@@ -15,7 +15,7 @@ model Product {
   name            String
   brand           String
   category        String
-  slug            String      @unique
+  slug            String?     @unique
   description     String?
   specifications  String      // JSON string for SQLite
   currentPrice    Float?
@@ -24,6 +24,8 @@ model Product {
   affiliateLinks  String?     // JSON string for SQLite
   reviewSummary   String?     // JSON string for SQLite
   availability    String?     // JSON string for SQLite
+  pros            String?     // JSON string array for SQLite
+  cons            String?     // JSON string array for SQLite
   lastUpdated     DateTime    @default(now())
   createdAt       DateTime    @default(now())
   

@@ -33,13 +33,14 @@ export async function POST(request: Request) {
           name: product1Name,
           category: 'Electronics',
           brand: product1Data.brand || product1Name.split(' ')[0],
-          price: product1Data.price || 999,
-          image: product1Data.image || '📱',
+          slug: product1Name.toLowerCase().replace(/\s+/g, '-'),
+          currentPrice: product1Data.price || 999,
+          images: JSON.stringify([product1Data.image || '📱']),
           description: `${product1Name} - Premium device`,
-          affiliateLink: `https://amzn.to/example-${product1Name.toLowerCase().replace(/\s+/g, '-')}`,
-          specifications: product1Data.specs || {},
-          pros: product1Data.pros || ['Great performance', 'Premium build', 'Excellent display'],
-          cons: product1Data.cons || ['Premium pricing', 'Limited customization'],
+          affiliateLinks: JSON.stringify({amazon: `https://amzn.to/example-${product1Name.toLowerCase().replace(/\s+/g, '-')}`}),
+          specifications: JSON.stringify(product1Data.specs || {}),
+          pros: JSON.stringify(product1Data.pros || ['Great performance', 'Premium build', 'Excellent display']),
+          cons: JSON.stringify(product1Data.cons || ['Premium pricing', 'Limited customization']),
         },
       });
     }
@@ -54,13 +55,14 @@ export async function POST(request: Request) {
           name: product2Name,
           category: 'Electronics',
           brand: product2Data.brand || product2Name.split(' ')[0],
-          price: product2Data.price || 999,
-          image: product2Data.image || '📱',
+          slug: product2Name.toLowerCase().replace(/\s+/g, '-'),
+          currentPrice: product2Data.price || 999,
+          images: JSON.stringify([product2Data.image || '📱']),
           description: `${product2Name} - Premium device`,
-          affiliateLink: `https://amzn.to/example-${product2Name.toLowerCase().replace(/\s+/g, '-')}`,
-          specifications: product2Data.specs || {},
-          pros: product2Data.pros || ['Great value', 'Good performance', 'Versatile features'],
-          cons: product2Data.cons || ['Average build', 'Limited support'],
+          affiliateLinks: JSON.stringify({amazon: `https://amzn.to/example-${product2Name.toLowerCase().replace(/\s+/g, '-')}`}),
+          specifications: JSON.stringify(product2Data.specs || {}),
+          pros: JSON.stringify(product2Data.pros || ['Great value', 'Good performance', 'Versatile features']),
+          cons: JSON.stringify(product2Data.cons || ['Average build', 'Limited support']),
         },
       });
     }
@@ -69,11 +71,11 @@ export async function POST(request: Request) {
     const comparison = await prisma.comparison.create({
       data: {
         slug,
+        title: `${product1Name} vs ${product2Name}`,
         product1Id: product1.id,
         product2Id: product2.id,
         viewCount: 1,
-        winner: product1Data.winner ? 'product1' : product2Data.winner ? 'product2' : 'tie',
-        analysis: `Detailed comparison between ${product1Name} and ${product2Name}. Both devices offer excellent features for their respective price points.`,
+        seoContent: `Detailed comparison between ${product1Name} and ${product2Name}. Both devices offer excellent features for their respective price points.`,
       },
     });
 

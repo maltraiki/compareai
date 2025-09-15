@@ -72,8 +72,10 @@ export function ChatInterface() {
         // Extract product names (simple extraction)
         const vsMatch = input.match(/(.+?)\s+(?:vs\.?|versus|or|compare)\s+(.+)/i) || 
                        input.match(/compare\s+(.+?)\s+(?:and|with|to)\s+(.+)/i);
+        console.log('Comparison detected, vsMatch:', vsMatch);
         if (vsMatch) {
           const [, product1, product2] = vsMatch;
+          console.log('Products:', product1, product2);
           
           try {
             // Save comparison to database
@@ -94,12 +96,15 @@ export function ChatInterface() {
               }),
             });
 
+            console.log('Comparison API response:', compResponse.status);
             if (compResponse.ok) {
               const compData = await compResponse.json();
+              console.log('Comparison data:', compData);
               const comparisonUrl = `/compare/${compData.slug}`;
               
               // Add link message
               setTimeout(() => {
+                console.log('Adding comparison link message');
                 setMessages(prev => [...prev, {
                   id: (Date.now() + 2).toString(),
                   role: 'assistant',
@@ -107,6 +112,8 @@ export function ChatInterface() {
                   timestamp: new Date(),
                 }]);
               }, 1000);
+            } else {
+              console.error('Comparison API failed:', await compResponse.text());
             }
           } catch (error) {
             console.error('Failed to save comparison:', error);

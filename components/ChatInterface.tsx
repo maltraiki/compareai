@@ -69,12 +69,26 @@ export function ChatInterface() {
       // Check if this is a comparison and create a landing page
       const lowerInput = input.trim().toLowerCase();
       if (lowerInput.includes('vs') || lowerInput.includes('versus') || lowerInput.includes('compare')) {
-        // Extract product names (simple extraction)
-        const vsMatch = input.match(/(.+?)\s+(?:vs\.?|versus|or|compare)\s+(.+)/i) || 
-                       input.match(/compare\s+(.+?)\s+(?:and|with|to)\s+(.+)/i);
+        // Extract product names - improved regex
+        let product1 = '';
+        let product2 = '';
+        
+        // Try different patterns
+        const patterns = [
+          /compare\s+(.+?)\s+(?:vs\.?|versus|and|with|to)\s+(.+)/i,
+          /(.+?)\s+(?:vs\.?|versus)\s+(.+)/i,
+          /(.+?)\s+or\s+(.+)/i,
+        ];
+        
+        let vsMatch = null;
+        for (const pattern of patterns) {
+          vsMatch = input.match(pattern);
+          if (vsMatch) break;
+        }
+        
         console.log('Comparison detected, vsMatch:', vsMatch);
         if (vsMatch) {
-          const [, product1, product2] = vsMatch;
+          [, product1, product2] = vsMatch;
           console.log('Products:', product1, product2);
           
           try {
@@ -102,16 +116,18 @@ export function ChatInterface() {
               console.log('Comparison data:', compData);
               const comparisonUrl = `/compare/${compData.slug}`;
               
-              // Add link message
-              setTimeout(() => {
-                console.log('Adding comparison link message');
-                setMessages(prev => [...prev, {
-                  id: (Date.now() + 2).toString(),
-                  role: 'assistant',
-                  content: `📊 I've created a detailed comparison page with photos and specs for you!\n\n👉 [View Full Comparison with Photos](${comparisonUrl})\n\nThis page includes product images, detailed specifications, pros & cons, and my expert recommendations!`,
-                  timestamp: new Date(),
-                }]);
-              }, 1000);
+              // Add link message immediately as part of the response
+              const linkMessage = `\n\n---\n\n📊 **[Click here to view the full comparison with photos and detailed specs](${comparisonUrl})**\n\nThis comparison page includes:\n• Product images\n• Side-by-side specifications\n• Detailed pros & cons\n• MT's expert recommendation`;
+              
+              // Update the last message to include the link
+              setMessages(prev => {
+                const updatedMessages = [...prev];
+                const lastMessage = updatedMessages[updatedMessages.length - 1];
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  lastMessage.content = lastMessage.content + linkMessage;
+                }
+                return updatedMessages;
+              });
             } else {
               console.error('Comparison API failed:', await compResponse.text());
             }

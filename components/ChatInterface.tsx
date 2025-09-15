@@ -67,10 +67,11 @@ export function ChatInterface() {
       setMessages(prev => [...prev, assistantMessage]);
 
       // Check if this is a comparison and create a landing page
-      const lowerInput = input.toLowerCase();
-      if (lowerInput.includes(' vs ') || lowerInput.includes(' versus ') || lowerInput.includes('compare')) {
+      const lowerInput = input.trim().toLowerCase();
+      if (lowerInput.includes('vs') || lowerInput.includes('versus') || lowerInput.includes('compare')) {
         // Extract product names (simple extraction)
-        const vsMatch = input.match(/(.+?)\s+(?:vs|versus|or|compare)\s+(.+)/i);
+        const vsMatch = input.match(/(.+?)\s+(?:vs\.?|versus|or|compare)\s+(.+)/i) || 
+                       input.match(/compare\s+(.+?)\s+(?:and|with|to)\s+(.+)/i);
         if (vsMatch) {
           const [, product1, product2] = vsMatch;
           
@@ -173,9 +174,31 @@ export function ChatInterface() {
                   : 'bg-white border border-gray-200'
               }`}
             >
-              <p className="whitespace-pre-wrap text-sm">
-                {message.content}
-              </p>
+              <div className="whitespace-pre-wrap text-sm">
+                {message.content.split('\n').map((line, i) => {
+                  // Check if line contains a link
+                  const linkMatch = line.match(/\[(.+?)\]\((.+?)\)/);
+                  if (linkMatch) {
+                    const [fullMatch, text, url] = linkMatch;
+                    const parts = line.split(fullMatch);
+                    return (
+                      <div key={i}>
+                        {parts[0]}
+                        <a 
+                          href={url} 
+                          className="text-blue-600 underline hover:text-blue-800 font-semibold"
+                          target={url.startsWith('http') ? '_blank' : '_self'}
+                          rel={url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        >
+                          {text}
+                        </a>
+                        {parts[1]}
+                      </div>
+                    );
+                  }
+                  return <div key={i}>{line || '\u00A0'}</div>;
+                })}
+              </div>
             </div>
           </div>
         ))}

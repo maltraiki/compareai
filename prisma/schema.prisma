@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id              String      @id @default(cuid())
+  name            String
+  brand           String
+  category        String
+  slug            String      @unique
+  description     String?
+  specifications  String      // JSON string for SQLite
+  currentPrice    Float?
+  priceHistory    String?     // JSON string for SQLite
+  images          String?     // JSON string array for SQLite
+  affiliateLinks  String?     // JSON string for SQLite
+  reviewSummary   String?     // JSON string for SQLite
+  availability    String?     // JSON string for SQLite
+  lastUpdated     DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  
+  comparisonsAsProduct1 Comparison[] @relation("Product1")
+  comparisonsAsProduct2 Comparison[] @relation("Product2")
+}
+
+model Comparison {
+  id              String      @id @default(cuid())
+  product1Id      String
+  product2Id      String
+  slug            String      @unique
+  title           String
+  conversation    String?     // JSON string for SQLite
+  seoContent      String?
+  viewCount       Int         @default(0)
+  lastViewed      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  product1        Product     @relation("Product1", fields: [product1Id], references: [id])
+  product2        Product     @relation("Product2", fields: [product2Id], references: [id])
+  
+  savedByUsers    SavedComparison[]
+  
+  @@index([slug])
+  @@index([viewCount])
+}
+
+model User {
+  id              String      @id @default(cuid())
+  email           String      @unique
+  name            String?
+  preferences     String?     // JSON string for SQLite
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  savedComparisons SavedComparison[]
+  priceAlerts     PriceAlert[]
+  conversations   Conversation[]
+}
+
+model SavedComparison {
+  id              String      @id @default(cuid())
+  userId          String
+  comparisonId    String
+  notes           String?
+  createdAt       DateTime    @default(now())
+  
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comparison      Comparison  @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, comparisonId])
+}
+
+model PriceAlert {
+  id              String      @id @default(cuid())
+  userId          String
+  productId       String
+  targetPrice     Float
+  isActive        Boolean     @default(true)
+  triggeredAt     DateTime?
+  createdAt       DateTime    @default(now())
+  
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id              String      @id @default(cuid())
+  userId          String?
+  sessionId       String      @unique
+  messages        String      // JSON string for SQLite
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  user            User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+}

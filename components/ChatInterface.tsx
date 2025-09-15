@@ -15,7 +15,7 @@ export function ChatInterface() {
     {
       id: '1',
       role: 'assistant',
-      content: "👋 Hi! I'm Alex, your personal shopping expert! Tell me what you're looking to buy and I'll help you compare products and find the best deals. Try asking me things like:\n\n• 'Compare iPhone 15 Pro vs Samsung Galaxy S24'\n• 'What's the best laptop under $1500?'\n• 'Should I buy AirPods Pro or Sony WH-1000XM5?'",
+      content: "👋 Hi! I'm MT, your personal shopping expert! Tell me what you're looking to buy and I'll help you compare products and find the best deals. Try asking me things like:\n\n• 'Compare iPhone 15 Pro vs Samsung Galaxy S24'\n• 'What's the best laptop under $1500?'\n• 'Should I buy AirPods Pro or Sony WH-1000XM5?'",
       timestamp: new Date(),
     },
   ]);
@@ -135,7 +135,7 @@ export function ChatInterface() {
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg">Chat with Alex</h3>
+            <h3 className="text-white font-bold text-lg">Chat with MT</h3>
             <p className="text-white/80 text-sm">Your AI Shopping Expert</p>
           </div>
           <div className="ml-auto flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full">
@@ -210,7 +210,7 @@ export function ChatInterface() {
             <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
-                <span className="text-sm text-gray-600">Alex is thinking...</span>
+                <span className="text-sm text-gray-600">MT is thinking...</span>
               </div>
             </div>
           </div>

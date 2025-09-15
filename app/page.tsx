@@ -28,7 +28,7 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-green-700">Alex is Online</span>
+                <span className="text-sm font-medium text-green-700">MT is Online</span>
               </div>
               <div className="flex items-center gap-1 bg-purple-50 px-3 py-1 rounded-full">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
@@ -52,14 +52,14 @@ export default function Home() {
           
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
             <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Meet Alex
+              Meet MT
             </span>
             <br />
             <span className="text-gray-800">Your Personal Shopping Expert</span>
           </h1>
           
           <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto font-medium">
-            Hi! I&apos;m Alex, your personal shopping expert. I&apos;ve helped 50,000+ people save money by finding the perfect products at the best prices. Let me help you make smart buying decisions!
+            Hi! I&apos;m MT, your personal shopping expert. I&apos;ve helped 50,000+ people save money by finding the perfect products at the best prices. Let me help you make smart buying decisions!
           </p>
           
           <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -83,26 +83,6 @@ export default function Home() {
           <ChatInterface />
         </div>
 
-        {/* Trust Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-white rounded-xl p-4 text-center shadow-lg border-2 border-purple-100">
-            <div className="text-3xl font-bold text-purple-600">50K+</div>
-            <div className="text-sm text-gray-600 font-medium">Happy Shoppers</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center shadow-lg border-2 border-green-100">
-            <div className="text-3xl font-bold text-green-600">$2M+</div>
-            <div className="text-sm text-gray-600 font-medium">Money Saved</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center shadow-lg border-2 border-blue-100">
-            <div className="text-3xl font-bold text-blue-600">10K+</div>
-            <div className="text-sm text-gray-600 font-medium">Products Compared</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center shadow-lg border-2 border-yellow-100">
-            <div className="text-3xl font-bold text-yellow-600">4.9★</div>
-            <div className="text-sm text-gray-600 font-medium">Average Rating</div>
-          </div>
-        </div>
-
         {/* Customer Reviews */}
         <section className="py-12 mb-12">
           <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
@@ -116,7 +96,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-gray-700 mb-3 font-medium">
-                &quot;Alex helped me save $500 on my new laptop! The comparison was so detailed and easy to understand.&quot;
+                &quot;MT helped me save $500 on my new laptop! The comparison was so detailed and easy to understand.&quot;
               </p>
               <p className="text-sm text-gray-600 font-bold">- Sarah M., Verified Buyer</p>
             </div>
@@ -127,7 +107,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-gray-700 mb-3 font-medium">
-                &quot;I always check with Alex before making any tech purchase. It&apos;s like having a tech expert friend!&quot;
+                &quot;I always check with MT before making any tech purchase. It&apos;s like having a tech expert friend!&quot;
               </p>
               <p className="text-sm text-gray-600 font-bold">- John D., Tech Enthusiast</p>
             </div>

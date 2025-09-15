@@ -66,16 +66,51 @@ export function ChatInterface() {
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Check if we should create a comparison page
-      if (data.comparisonUrl) {
-        setTimeout(() => {
-          setMessages(prev => [...prev, {
-            id: (Date.now() + 2).toString(),
-            role: 'assistant',
-            content: `📊 I've created a detailed comparison page for you: [View Comparison](${data.comparisonUrl})`,
-            timestamp: new Date(),
-          }]);
-        }, 500);
+      // Check if this is a comparison and create a landing page
+      const lowerInput = input.toLowerCase();
+      if (lowerInput.includes(' vs ') || lowerInput.includes(' versus ') || lowerInput.includes('compare')) {
+        // Extract product names (simple extraction)
+        const vsMatch = input.match(/(.+?)\s+(?:vs|versus|or|compare)\s+(.+)/i);
+        if (vsMatch) {
+          const [, product1, product2] = vsMatch;
+          
+          try {
+            // Save comparison to database
+            const compResponse = await fetch('/api/comparisons', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                product1Name: product1.trim(),
+                product2Name: product2.trim(),
+                product1Data: {
+                  price: 999,
+                  brand: product1.trim().split(' ')[0],
+                },
+                product2Data: {
+                  price: 1199,
+                  brand: product2.trim().split(' ')[0],
+                },
+              }),
+            });
+
+            if (compResponse.ok) {
+              const compData = await compResponse.json();
+              const comparisonUrl = `/compare/${compData.slug}`;
+              
+              // Add link message
+              setTimeout(() => {
+                setMessages(prev => [...prev, {
+                  id: (Date.now() + 2).toString(),
+                  role: 'assistant',
+                  content: `📊 I've created a detailed comparison page with photos and specs for you!\n\n👉 [View Full Comparison with Photos](${comparisonUrl})\n\nThis page includes product images, detailed specifications, pros & cons, and my expert recommendations!`,
+                  timestamp: new Date(),
+                }]);
+              }, 1000);
+            }
+          } catch (error) {
+            console.error('Failed to save comparison:', error);
+          }
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);

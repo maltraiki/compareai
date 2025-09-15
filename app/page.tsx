@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Star, ShieldCheck, Zap, Trophy, DollarSign } from 'lucide-react';
 import { Metadata } from 'next';
+import { ChatInterface } from '@/components/ChatInterface';
 
 export const metadata: Metadata = {
   title: 'CompareAI - Your Personal Shopping Expert | Save Money on Every Purchase',
@@ -77,18 +78,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Temporary Chat Interface - Coming Soon */}
+        {/* Chat Interface */}
         <div className="mb-16">
-          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Chat with Alex - Coming Soon!</h2>
-            <p className="text-gray-600 mb-6">
-              Our AI shopping assistant is being prepared for you. Check back in a few minutes!
-            </p>
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-6 py-3 rounded-lg">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="font-medium">Alex is getting ready...</span>
-            </div>
-          </div>
+          <ChatInterface />
         </div>
 
         {/* Trust Badges */}

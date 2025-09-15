@@ -1,16 +1,27 @@
+import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import {locales, defaultLocale} from './i18n/config';
- 
-export default createMiddleware({
+
+const intlMiddleware = createMiddleware({
   // A list of all locales that are supported
   locales,
- 
+
   // Used when no locale matches
   defaultLocale,
   
   // Always use locale prefix to avoid issues
   localePrefix: 'always'
 });
+
+export default function middleware(request: NextRequest) {
+  try {
+    return intlMiddleware(request);
+  } catch (error) {
+    console.error('Middleware error:', error);
+    // Fallback to redirecting to /en
+    return NextResponse.redirect(new URL('/en', request.url));
+  }
+}
  
 export const config = {
   // Match all pathnames except for

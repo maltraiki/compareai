@@ -6,13 +6,14 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle, XCircle, TrendingUp, ExternalLink } from 'lucide-react';
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
   const comparison = await prisma.comparison.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       product1: true,
       product2: true,
@@ -63,9 +64,10 @@ export async function generateStaticParams() {
 }
 
 export default async function ComparisonPage({ params }: PageProps) {
+  const { slug } = await params;
   // Update view count
   await prisma.comparison.update({
-    where: { slug: params.slug },
+    where: { slug },
     data: { 
       viewCount: { increment: 1 },
       lastViewed: new Date(),
@@ -73,7 +75,7 @@ export default async function ComparisonPage({ params }: PageProps) {
   });
 
   const comparison = await prisma.comparison.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       product1: true,
       product2: true,

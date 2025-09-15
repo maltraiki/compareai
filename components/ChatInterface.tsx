@@ -60,7 +60,7 @@ export function ChatInterface() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.message,
+        content: data.response || data.message || 'Sorry, I could not generate a response.',
         timestamp: new Date(),
       };
 

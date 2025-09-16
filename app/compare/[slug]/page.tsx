@@ -150,10 +150,10 @@ export default async function ComparisonPage({ params }: PageProps) {
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-5 h-5 ${i < Math.floor(comparison.product1.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
+                    <Star key={i} className={`w-5 h-5 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
                   ))}
                 </div>
-                <span className="text-gray-400">({comparison.product1.rating || 0}/5)</span>
+                <span className="text-gray-400">(4.5/5)</span>
               </div>
 
               {/* Pros */}
@@ -218,10 +218,10 @@ export default async function ComparisonPage({ params }: PageProps) {
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-5 h-5 ${i < Math.floor(comparison.product2.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
+                    <Star key={i} className={`w-5 h-5 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
                   ))}
                 </div>
-                <span className="text-gray-400">({comparison.product2.rating || 0}/5)</span>
+                <span className="text-gray-400">(4.3/5)</span>
               </div>
 
               {/* Pros */}

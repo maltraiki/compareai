@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { geminiModel } from '@/lib/gemini';
 import { prisma } from '@/lib/prisma';
 import { generateComparisonSlug, jsonStringify } from '@/lib/utils';
+import { getProductImageUrl } from '@/lib/image-utils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -59,10 +60,10 @@ export async function POST(req: NextRequest) {
     6. ALL data must be CURRENT as of ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
     
     For product images:
-    - Search Google Images for "[product name] official image ${new Date().getFullYear()}"
-    - Use manufacturer website images (apple.com, samsung.com, etc.)
-    - Get high-resolution product photos from retailer listings
-    - NEVER use placeholder or generic images
+    - Use this format: https://via.placeholder.com/400x300/6B46C1/FFFFFF?text=[PRODUCT_NAME_URL_ENCODED]
+    - Replace [PRODUCT_NAME_URL_ENCODED] with the product name (spaces as +)
+    - Example: https://via.placeholder.com/400x300/6B46C1/FFFFFF?text=iPhone+15+Pro
+    - This ensures images always load properly
     
     For prices:
     - Search "${config.retailers[0]} [product name] price today"
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         product1: {
           name: 'Product Analysis Failed',
-          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMTUwIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE5cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+UHJvZHVjdCBJbWFnZTwvdGV4dD48L3N2Zz4=',
+          image: getProductImageUrl('Product'),
           price: 'N/A',
           rating: 0,
           pros: ['Unable to fetch product data'],
@@ -162,7 +163,7 @@ export async function POST(req: NextRequest) {
         },
         product2: {
           name: 'Product Analysis Failed',
-          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMTUwIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE5cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+UHJvZHVjdCBJbWFnZTwvdGV4dD48L3N2Zz4=',
+          image: getProductImageUrl('Product'),
           price: 'N/A',
           rating: 0,
           pros: ['Unable to fetch product data'],
@@ -173,6 +174,10 @@ export async function POST(req: NextRequest) {
         recommendation: 'Please try again with a specific product comparison.'
       });
     }
+    
+    // Fix image URLs using our image utility
+    comparisonData.product1.image = getProductImageUrl(comparisonData.product1.name);
+    comparisonData.product2.image = getProductImageUrl(comparisonData.product2.name);
 
     // Save comparison to database for SEO landing page
     try {

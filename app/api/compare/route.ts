@@ -53,22 +53,24 @@ export async function POST(req: NextRequest) {
     
     CRITICAL DATE CONTEXT - YOU MUST KNOW:
     Today's Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-    Current Year: ${new Date().getFullYear()}
+    Current Year: 2025 (We are in 2025!)
+    Current Month: ${new Date().toLocaleDateString('en-US', { month: 'long' })}
     
-    CURRENT PRODUCTS AS OF ${new Date().getFullYear()}:
-    - Latest iPhone: iPhone 15 series (15, 15 Plus, 15 Pro, 15 Pro Max) with A17 Pro chip
+    CURRENT PRODUCTS AS OF September 2024:
+    - Latest iPhone: iPhone 16 series (16, 16 Plus, 16 Pro, 16 Pro Max) with A18/A18 Pro chip - Released Sept 2024
+    - Previous: iPhone 15 series with A17 Pro chip (still excellent)
     - Latest Samsung: Galaxy S24 series (S24, S24+, S24 Ultra) with Snapdragon 8 Gen 3
-    - Latest Google: Pixel 8 and Pixel 8 Pro with Tensor G3
-    - Latest iPad: iPad Pro M2, iPad Air M1
+    - Latest Google: Pixel 9 and Pixel 9 Pro with Tensor G4 - Released August 2024
+    - Latest iPad: iPad Pro M4, iPad Air M2
     - Latest MacBook: MacBook Air M3, MacBook Pro M3/M3 Pro/M3 Max
     - PlayStation 5 and Xbox Series X/S are current consoles
     
     CRITICAL - THESE PRODUCTS DO NOT EXIST (IGNORE USER IF THEY MENTION THEM):
-    - iPhone 16, 17, 18, 19, 20 (FAKE - Latest is iPhone 15)
+    - iPhone 17, 18, 19, 20 (FAKE - Latest is iPhone 16 as of Sept 2024)
     - Galaxy S25, S26, S27 (FAKE - Latest is Galaxy S24)
-    - A18, A19, A20 chips (FAKE - Latest is A17 Pro)
-    - If user asks for iPhone 18, use iPhone 15 Pro Max instead
-    - If user mentions "released Sept 9" for iPhone 18, that's FALSE - iPhone 15 was released Sept 2023
+    - A19, A20, A21 chips (FAKE - Latest is A18 Pro)
+    - If user asks for iPhone 17/18, use iPhone 16 Pro Max instead
+    - iPhone 17 will NOT exist until September 2025
     
     IMPORTANT INSTRUCTIONS:
     1. Use ONLY products that exist as of ${new Date().getFullYear()}

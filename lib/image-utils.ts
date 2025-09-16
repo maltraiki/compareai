@@ -5,9 +5,16 @@ export function getProductImageUrl(productName: string): string {
   
   // Try to identify product type and brand
   if (cleanName.includes('iphone')) {
-    // Extract model number
-    const model = cleanName.match(/iphone\s*(\d+\s*(pro|plus|mini)?(\s*max)?)/i)?.[1] || '15';
-    return `https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-card-40-iphone${model.replace(/\s+/g, '').toLowerCase()}-202409?wid=400&hei=300&fmt=jpeg&qlt=90`;
+    // Extract model number - support iPhone 16 (latest) and 15
+    const model = cleanName.match(/iphone\s*(\d+\s*(pro|plus|mini)?(\s*max)?)/i)?.[1] || '16';
+    const modelClean = model.replace(/\s+/g, '').toLowerCase();
+    
+    // iPhone 16 series images (latest as of Sept 2024)
+    if (modelClean.includes('16')) {
+      return `https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409?wid=400&hei=300&fmt=jpeg&qlt=90`;
+    }
+    // iPhone 15 series images
+    return `https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-card-40-iphone${modelClean}-202409?wid=400&hei=300&fmt=jpeg&qlt=90`;
   }
   
   if (cleanName.includes('samsung') && cleanName.includes('galaxy')) {

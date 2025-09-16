@@ -61,15 +61,15 @@ export default async function ComparisonPage({ params }: PageProps) {
   });
 
   // Parse JSON data
-  const product1Images = safeJsonParse(comparison.product1.images, []);
-  const product2Images = safeJsonParse(comparison.product2.images, []);
-  const product1Specs = safeJsonParse(comparison.product1.specifications, {});
-  const product2Specs = safeJsonParse(comparison.product2.specifications, {});
-  const product1Pros = safeJsonParse(comparison.product1.pros, []);
-  const product1Cons = safeJsonParse(comparison.product1.cons, []);
-  const product2Pros = safeJsonParse(comparison.product2.pros, []);
-  const product2Cons = safeJsonParse(comparison.product2.cons, []);
-  const conversation = safeJsonParse(comparison.conversation, {});
+  const product1Images = safeJsonParse(comparison.product1.images as any, []);
+  const product2Images = safeJsonParse(comparison.product2.images as any, []);
+  const product1Specs = safeJsonParse(comparison.product1.specifications as any, {});
+  const product2Specs = safeJsonParse(comparison.product2.specifications as any, {});
+  const product1Pros = safeJsonParse(comparison.product1.pros as any, []);
+  const product1Cons = safeJsonParse(comparison.product1.cons as any, []);
+  const product2Pros = safeJsonParse(comparison.product2.pros as any, []);
+  const product2Cons = safeJsonParse(comparison.product2.cons as any, []);
+  const conversation = safeJsonParse(comparison.conversation as any, {});
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">

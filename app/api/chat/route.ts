@@ -125,11 +125,19 @@ export async function POST(req: NextRequest) {
 
     // Save conversation to database
     try {
+      const existingConversation = await prisma.conversation.findUnique({ 
+        where: { sessionId } 
+      });
+      
+      const existingMessages = existingConversation?.messages 
+        ? safeJsonParse(existingConversation.messages as any, [])
+        : [];
+      
       await prisma.conversation.upsert({
         where: { sessionId },
         update: {
           messages: jsonStringify([
-            ...safeJsonParse((await prisma.conversation.findUnique({ where: { sessionId } }))?.messages, []),
+            ...existingMessages,
             { role: 'user', content: message },
             { role: 'assistant', content: response }
           ]),

@@ -56,21 +56,25 @@ export async function POST(req: NextRequest) {
     3. Check actual prices from these retailers: ${config.retailers.join(', ')}
     4. Get REAL product specifications from manufacturer websites
     5. Find ACTUAL user reviews and ratings from trusted sources
-    6. ALL data must be from 2024/2025 - NO old information
+    6. ALL data must be CURRENT as of ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
     
     For product images:
-    - Search Google Images for "[product name] official image 2024"
+    - Search Google Images for "[product name] official image ${new Date().getFullYear()}"
     - Use manufacturer website images (apple.com, samsung.com, etc.)
     - Get high-resolution product photos from retailer listings
     - NEVER use placeholder or generic images
     
     For prices:
-    - Search "${config.retailers[0]} [product name] price"
-    - Check multiple retailers and use the best available price
-    - Include any current deals or discounts
-    - Prices MUST be in ${config.currency}
+    - Search "${config.retailers[0]} [product name] price today"
+    - Check multiple retailers for CURRENT prices as of ${new Date().toLocaleDateString()}
+    - Include any active deals, discounts, or promotions happening RIGHT NOW
+    - Prices MUST be in ${config.currency} and MUST be today's actual prices
     
-    IMPORTANT: You have internet access. USE IT to get real data. Do NOT make up information.
+    IMPORTANT: 
+    - You have FULL internet access. USE IT to get REAL, CURRENT data.
+    - All information must be accurate as of TODAY: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+    - Do NOT use outdated information. Search for the LATEST data available.
+    - Do NOT make up information. Only use what you find online RIGHT NOW.
     
     Provide ONLY valid JSON in this exact format:
     

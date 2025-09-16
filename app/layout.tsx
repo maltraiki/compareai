@@ -5,8 +5,34 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CompareAI - Smart Product Comparisons",
-  description: "Get intelligent product comparisons powered by AI",
+  title: "CompareAI by MT - Smart Product Comparisons with Real Data",
+  description: "Compare products instantly with AI-powered analysis. Get real photos, prices, specs, pros & cons. iPhone vs Samsung, MacBook vs Dell, AirPods vs Sony. Make smart buying decisions with MT's expert recommendations.",
+  keywords: "product comparison, compare products, iphone vs samsung, macbook vs dell, ipad vs surface, airpods vs sony, product reviews, tech comparison, shopping guide, best deals, MT compareai, smart shopping, price comparison",
+  authors: [{ name: "MT" }],
+  openGraph: {
+    title: "CompareAI by MT - Smart Product Comparisons",
+    description: "Compare any products instantly with AI. Real photos, prices, and expert recommendations.",
+    url: "https://compare-ai-fawn.vercel.app",
+    siteName: "CompareAI",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CompareAI by MT - Smart Product Comparisons",
+    description: "Compare any products instantly with AI-powered analysis",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -14,5 +40,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return (
+    <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="https://compare-ai-fawn.vercel.app" />
+      </head>
+      <body className={inter.className}>{children}</body>
+    </html>
+  );
 }

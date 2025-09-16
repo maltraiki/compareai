@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model Product {
@@ -16,16 +16,16 @@ model Product {
   brand           String
   category        String
   slug            String?     @unique
-  description     String?
-  specifications  String      // JSON string for SQLite
+  description     String?     @db.Text
+  specifications  Json        @default("{}")
   currentPrice    Float?
-  priceHistory    String?     // JSON string for SQLite
-  images          String?     // JSON string array for SQLite
-  affiliateLinks  String?     // JSON string for SQLite
-  reviewSummary   String?     // JSON string for SQLite
-  availability    String?     // JSON string for SQLite
-  pros            String?     // JSON string array for SQLite
-  cons            String?     // JSON string array for SQLite
+  priceHistory    Json?       
+  images          Json?       
+  affiliateLinks  Json?       
+  reviewSummary   Json?       
+  availability    Json?       
+  pros            Json?       
+  cons            Json?
   lastUpdated     DateTime    @default(now())
   createdAt       DateTime    @default(now())
   
@@ -39,7 +39,7 @@ model Comparison {
   product2Id      String
   slug            String      @unique
   title           String
-  conversation    String?     // JSON string for SQLite
+  conversation    Json?       
   seoContent      String?
   viewCount       Int         @default(0)
   lastViewed      DateTime?
@@ -59,7 +59,7 @@ model User {
   id              String      @id @default(cuid())
   email           String      @unique
   name            String?
-  preferences     String?     // JSON string for SQLite
+  preferences     Json?       
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   
@@ -97,7 +97,7 @@ model Conversation {
   id              String      @id @default(cuid())
   userId          String?
   sessionId       String      @unique
-  messages        String      // JSON string for SQLite
+  messages        Json        
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   

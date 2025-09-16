@@ -56,17 +56,26 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
-// Parse JSON safely
-export function safeJsonParse(str: string | null | undefined, fallback: any = null): any {
-  if (!str) return fallback;
+// Parse JSON safely - now handles both string and native JSON from Prisma
+export function safeJsonParse(data: string | object | null | undefined, fallback: any = null): any {
+  if (!data) return fallback;
+  
+  // If it's already an object (from Prisma Json type), return it directly
+  if (typeof data === 'object') {
+    return data;
+  }
+  
+  // If it's a string, try to parse it
   try {
-    return JSON.parse(str);
+    return JSON.parse(data);
   } catch {
     return fallback;
   }
 }
 
-// Stringify JSON for SQLite storage
-export function jsonStringify(obj: any): string {
-  return JSON.stringify(obj);
+// For PostgreSQL with Prisma Json type, we can pass objects directly
+export function jsonStringify(obj: any): any {
+  // With PostgreSQL Json type, Prisma handles the conversion automatically
+  // We just return the object as-is
+  return obj;
 }

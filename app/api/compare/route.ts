@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { geminiModel } from '@/lib/gemini';
 import { prisma } from '@/lib/prisma';
 import { generateComparisonSlug, jsonStringify } from '@/lib/utils';
-import { searchProductImage, searchProductPrice } from '@/lib/product-search';
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,93 +14,121 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Enhanced prompt for MT with better instructions for real data
-    const prompt = `You are MT, a highly experienced personal technology advisor with deep knowledge of the latest tech products, their real market prices, and availability.
+    // Get user location and currency
+    const country = req.headers.get('x-vercel-ip-country') || req.geo?.country || 'US';
+    
+    // Determine currency and retailers based on location
+    const locationConfig: { [key: string]: { currency: string, retailers: string[] } } = {
+      'SA': { 
+        currency: 'SAR (Saudi Riyals)', 
+        retailers: ['amazon.sa', 'noon.com', 'jarir.com', 'extra.com']
+      },
+      'AE': { 
+        currency: 'AED (UAE Dirhams)', 
+        retailers: ['amazon.ae', 'noon.com', 'sharafdg.com']
+      },
+      'US': { 
+        currency: 'USD (US Dollars)', 
+        retailers: ['amazon.com', 'bestbuy.com', 'walmart.com']
+      },
+      'GB': { 
+        currency: 'GBP (British Pounds)', 
+        retailers: ['amazon.co.uk', 'currys.co.uk', 'argos.co.uk']
+      },
+      'IN': { 
+        currency: 'INR (Indian Rupees)', 
+        retailers: ['amazon.in', 'flipkart.com', 'croma.com']
+      }
+    };
+    
+    const config = locationConfig[country] || locationConfig['US'];
+    
+    // Enhanced prompt with REAL internet access instructions
+    const prompt = `You are MT, a highly experienced personal technology advisor. You have FULL INTERNET ACCESS.
     
     User Query: "${query}"
+    User Location: ${country}
+    Currency: ${config.currency}
     
-    Analyze this query and provide a detailed comparison. If the user mentions specific products, compare those. 
-    If they ask general questions, identify the two best options to compare.
+    CRITICAL INSTRUCTIONS:
+    1. USE YOUR INTERNET ACCESS to search for REAL, CURRENT information
+    2. Search Google/Bing for the latest product images from official sources
+    3. Check actual prices from these retailers: ${config.retailers.join(', ')}
+    4. Get REAL product specifications from manufacturer websites
+    5. Find ACTUAL user reviews and ratings from trusted sources
+    6. ALL data must be from 2024/2025 - NO old information
     
-    IMPORTANT INSTRUCTIONS:
-    1. Use REAL, CURRENT market prices in SAR (Saudi Riyals) when possible
-    2. Check prices from retailers like Amazon.sa, Noon.com, Jarir.com, Extra.com
-    3. For images, search for actual product images from official sources
-    4. Include ACCURATE technical specifications from 2024/2025
-    5. Provide genuine pros and cons based on real user reviews
+    For product images:
+    - Search Google Images for "[product name] official image 2024"
+    - Use manufacturer website images (apple.com, samsung.com, etc.)
+    - Get high-resolution product photos from retailer listings
+    - NEVER use placeholder or generic images
     
-    IMPORTANT: Provide ONLY valid JSON in this exact format with realistic, current market data.
-    For prices, use actual Saudi Arabian market prices (SAR):
+    For prices:
+    - Search "${config.retailers[0]} [product name] price"
+    - Check multiple retailers and use the best available price
+    - Include any current deals or discounts
+    - Prices MUST be in ${config.currency}
+    
+    IMPORTANT: You have internet access. USE IT to get real data. Do NOT make up information.
+    
+    Provide ONLY valid JSON in this exact format:
     
     {
       "product1": {
         "name": "Exact product name with model",
-        "image": "https://... (search for actual product image from official sources)",
-        "price": "SAR X,XXX",
+        "image": "ACTUAL image URL found from internet search",
+        "price": "${config.currency.split(' ')[0]} X,XXX",
         "rating": 4.5,
         "pros": [
-          "Specific advantage 1 with details",
-          "Specific advantage 2 with details",
-          "Specific advantage 3 with details"
+          "Real advantage from reviews",
+          "Actual feature benefit",
+          "True user feedback"
         ],
         "cons": [
-          "Specific limitation 1",
-          "Specific limitation 2",
-          "Specific limitation 3"
+          "Real limitation from reviews",
+          "Actual drawback",
+          "True user complaint"
         ],
         "specs": {
-          "Display": "Exact size and technology",
-          "Processor": "Exact chip model",
-          "Memory": "RAM and storage options",
-          "Battery": "Battery life in hours",
-          "Special Features": "Key unique features"
+          "Display": "Exact specification",
+          "Processor": "Actual chip model",
+          "Memory": "Real RAM and storage",
+          "Battery": "True battery life",
+          "Special Features": "Actual unique features"
         }
       },
       "product2": {
         "name": "Exact product name with model",
-        "image": "https://... (search for actual product image from official sources)",
-        "price": "SAR X,XXX",
+        "image": "ACTUAL image URL found from internet search",
+        "price": "${config.currency.split(' ')[0]} X,XXX",
         "rating": 4.3,
         "pros": [
-          "Specific advantage 1 with details",
-          "Specific advantage 2 with details",
-          "Specific advantage 3 with details"
+          "Real advantage from reviews",
+          "Actual feature benefit",
+          "True user feedback"
         ],
         "cons": [
-          "Specific limitation 1",
-          "Specific limitation 2",
-          "Specific limitation 3"
+          "Real limitation from reviews",
+          "Actual drawback",
+          "True user complaint"
         ],
         "specs": {
-          "Display": "Exact size and technology",
-          "Processor": "Exact chip model",
-          "Memory": "RAM and storage options",
-          "Battery": "Battery life in hours",
-          "Special Features": "Key unique features"
+          "Display": "Exact specification",
+          "Processor": "Actual chip model",
+          "Memory": "Real RAM and storage",
+          "Battery": "True battery life",
+          "Special Features": "Actual unique features"
         }
       },
-      "verdict": "A professional, detailed verdict explaining which product wins overall and why (2-3 sentences)",
-      "recommendation": "As your technology advisor, here's my personalized recommendation based on different use cases and user needs (3-4 sentences)"
+      "verdict": "Professional verdict based on real data and reviews (2-3 sentences)",
+      "recommendation": "Personalized recommendation based on actual user needs and real product performance (3-4 sentences)"
     }
     
-    For prices, search these Saudi retailers in order of preference:
-    - Amazon.sa (usually has competitive prices and wide selection)
-    - Noon.com (local favorite with good deals)
-    - Jarir.com (Jarir Bookstore - trusted for electronics)
-    - Extra.com (Extra Stores - major electronics retailer)
-    
-    For the image field, search for actual product images from:
-    - Official manufacturer websites (Apple.com, Samsung.com, etc.)
-    - Amazon.sa product listings
-    - Noon.com product pages
-    - Official press images
-    
-    ALWAYS provide prices in SAR (Saudi Riyals) format.
-    
-    Use real, current market data. Be specific with model numbers, exact specifications, and actual prices.
+    Remember: USE YOUR INTERNET ACCESS. Search for real data. NO hardcoded information.
     Provide ONLY the JSON, no markdown, no explanation, no text before or after.`;
 
-    // Get AI analysis
+    // Get AI analysis with internet access
     const result = await geminiModel.generateContent(prompt);
     const responseText = result.response.text();
     
@@ -118,60 +145,29 @@ export async function POST(req: NextRequest) {
     } catch (parseError) {
       console.error('JSON parsing error:', parseError);
       
-      // Fallback with better default images
+      // Return error response
       return NextResponse.json({
         product1: {
           name: 'Product Analysis Failed',
-          image: 'https://images.unsplash.com/photo-1491933382434-500287f9b54b?w=800&h=600&fit=crop',
-          price: 'N/A',
-          rating: 0,
-          pros: [
-            'Unable to fetch product data',
-            'Please try with specific product names',
-            'Example: "iPhone 15 Pro vs Samsung Galaxy S24"'
-          ],
-          cons: ['Data temporarily unavailable'],
-          specs: {
-            'Status': 'Please try again with clearer product names'
-          }
-        },
-        product2: {
-          name: 'Product Analysis Failed',
-          image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=600&fit=crop',
+          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMTUwIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE5cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+UHJvZHVjdCBJbWFnZTwvdGV4dD48L3N2Zz4=',
           price: 'N/A',
           rating: 0,
           pros: ['Unable to fetch product data'],
-          cons: ['Data temporarily unavailable'],
-          specs: {
-            'Status': 'Please try again'
-          }
+          cons: ['Please try again'],
+          specs: { 'Status': 'Data unavailable' }
         },
-        verdict: 'Unable to analyze products. Please provide specific product names.',
-        recommendation: 'Try asking: "Compare iPhone 15 Pro with Samsung Galaxy S24" or "Which laptop is better: MacBook Air M3 or Dell XPS 13?"'
+        product2: {
+          name: 'Product Analysis Failed',
+          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMTUwIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE5cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+UHJvZHVjdCBJbWFnZTwvdGV4dD48L3N2Zz4=',
+          price: 'N/A',
+          rating: 0,
+          pros: ['Unable to fetch product data'],
+          cons: ['Please try again'],
+          specs: { 'Status': 'Data unavailable' }
+        },
+        verdict: 'Unable to analyze products at this time.',
+        recommendation: 'Please try again with a specific product comparison.'
       });
-    }
-
-    // Use the product search utility for better image URLs
-    if (!comparisonData.product1.image || !comparisonData.product1.image.startsWith('http')) {
-      comparisonData.product1.image = await searchProductImage(comparisonData.product1.name);
-    }
-
-    if (!comparisonData.product2.image || !comparisonData.product2.image.startsWith('http')) {
-      comparisonData.product2.image = await searchProductImage(comparisonData.product2.name);
-    }
-
-    // Ensure prices are properly formatted (handle both $ and SAR)
-    if (comparisonData.product1.price) {
-      const price1 = comparisonData.product1.price;
-      if (!price1.startsWith('$') && !price1.startsWith('SAR')) {
-        comparisonData.product1.price = 'SAR ' + price1;
-      }
-    }
-    if (comparisonData.product2.price) {
-      const price2 = comparisonData.product2.price;
-      if (!price2.startsWith('$') && !price2.startsWith('SAR')) {
-        comparisonData.product2.price = 'SAR ' + price2;
-      }
     }
 
     // Save comparison to database for SEO landing page
@@ -184,13 +180,19 @@ export async function POST(req: NextRequest) {
       });
 
       if (!existingComparison) {
+        // Extract price as number
+        const getPrice = (priceStr: string) => {
+          const numbers = priceStr.replace(/[^0-9.]/g, '');
+          return parseFloat(numbers) || 0;
+        };
+
         // Create products if they don't exist
         const [product1, product2] = await Promise.all([
           prisma.product.upsert({
             where: { slug: generateComparisonSlug(comparisonData.product1.name, '') },
             update: {
               name: comparisonData.product1.name,
-              currentPrice: parseFloat(comparisonData.product1.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              currentPrice: getPrice(comparisonData.product1.price),
               images: jsonStringify([comparisonData.product1.image]),
               specifications: jsonStringify(comparisonData.product1.specs),
               pros: jsonStringify(comparisonData.product1.pros),
@@ -201,7 +203,7 @@ export async function POST(req: NextRequest) {
               brand: comparisonData.product1.name.split(' ')[0],
               category: 'Technology',
               slug: generateComparisonSlug(comparisonData.product1.name, ''),
-              currentPrice: parseFloat(comparisonData.product1.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              currentPrice: getPrice(comparisonData.product1.price),
               images: jsonStringify([comparisonData.product1.image]),
               specifications: jsonStringify(comparisonData.product1.specs),
               pros: jsonStringify(comparisonData.product1.pros),
@@ -213,7 +215,7 @@ export async function POST(req: NextRequest) {
             where: { slug: generateComparisonSlug(comparisonData.product2.name, '') },
             update: {
               name: comparisonData.product2.name,
-              currentPrice: parseFloat(comparisonData.product2.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              currentPrice: getPrice(comparisonData.product2.price),
               images: jsonStringify([comparisonData.product2.image]),
               specifications: jsonStringify(comparisonData.product2.specs),
               pros: jsonStringify(comparisonData.product2.pros),
@@ -224,7 +226,7 @@ export async function POST(req: NextRequest) {
               brand: comparisonData.product2.name.split(' ')[0],
               category: 'Technology',
               slug: generateComparisonSlug(comparisonData.product2.name, ''),
-              currentPrice: parseFloat(comparisonData.product2.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              currentPrice: getPrice(comparisonData.product2.price),
               images: jsonStringify([comparisonData.product2.image]),
               specifications: jsonStringify(comparisonData.product2.specs),
               pros: jsonStringify(comparisonData.product2.pros),

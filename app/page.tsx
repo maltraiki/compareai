@@ -123,11 +123,6 @@ export default function Home() {
         {/* Hero Section */}
         {!hasSearched && (
           <div className="text-center mb-12 animate-fadeIn">
-            <div className="inline-flex items-center gap-2 bg-purple-500/20 px-6 py-3 rounded-full border border-purple-500/30 mb-6">
-              <Shield className="w-5 h-5 text-purple-400" />
-              <span className="text-purple-300 font-medium">Trusted by 100,000+ Tech Buyers</span>
-            </div>
-            
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
               Hi, I'm <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">MT</span>
             </h2>

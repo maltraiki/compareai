@@ -45,19 +45,34 @@ export async function POST(req: NextRequest) {
     const config = locationConfig[country] || locationConfig['US'];
     
     // Enhanced prompt with REAL internet access instructions
-    const prompt = `You are MT, a highly experienced personal technology advisor. You have FULL INTERNET ACCESS.
+    const prompt = `You are MT, a highly experienced personal technology advisor with CURRENT knowledge.
     
     User Query: "${query}"
     User Location: ${country}
     Currency: ${config.currency}
     
-    CRITICAL INSTRUCTIONS:
-    1. USE YOUR INTERNET ACCESS to search for REAL, CURRENT information
-    2. Search Google/Bing for the latest product images from official sources
-    3. Check actual prices from these retailers: ${config.retailers.join(', ')}
-    4. Get REAL product specifications from manufacturer websites
-    5. Find ACTUAL user reviews and ratings from trusted sources
-    6. ALL data must be CURRENT as of ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+    CRITICAL DATE CONTEXT - YOU MUST KNOW:
+    Today's Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+    Current Year: ${new Date().getFullYear()}
+    
+    CURRENT PRODUCTS AS OF ${new Date().getFullYear()}:
+    - Latest iPhone: iPhone 15 series (15, 15 Plus, 15 Pro, 15 Pro Max) with A17 Pro chip
+    - Latest Samsung: Galaxy S24 series (S24, S24+, S24 Ultra) with Snapdragon 8 Gen 3
+    - Latest Google: Pixel 8 and Pixel 8 Pro with Tensor G3
+    - Latest iPad: iPad Pro M2, iPad Air M1
+    - Latest MacBook: MacBook Air M3, MacBook Pro M3/M3 Pro/M3 Max
+    - PlayStation 5 and Xbox Series X/S are current consoles
+    
+    NEVER mention products that don't exist yet like:
+    - iPhone 16, 17, 18 (NOT RELEASED)
+    - Galaxy S25, S26 (NOT RELEASED)
+    - Any chip beyond A17 Pro or M3 (NOT RELEASED)
+    
+    IMPORTANT INSTRUCTIONS:
+    1. Use ONLY products that exist as of ${new Date().getFullYear()}
+    2. Check actual prices from these retailers: ${config.retailers.join(', ')}
+    3. Get specifications from CURRENT models only
+    4. ALL data must be accurate as of ${new Date().toLocaleDateString()}
     
     For product images:
     - Use this format: https://via.placeholder.com/400x300/6B46C1/FFFFFF?text=[PRODUCT_NAME_URL_ENCODED]

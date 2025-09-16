@@ -42,15 +42,13 @@ export async function POST(req: NextRequest) {
       console.error('Direct search failed:', searchError);
     }
     
-    // Fallback: Use structured data based on known patterns
-    const fallbackData = await getFallbackData(query);
-    
+    // If we can't get real data, return error - NO FALLBACK!
     return NextResponse.json({
+      error: 'Unable to fetch current data',
+      message: 'Could not retrieve real-time information. Please try again.',
       query,
-      results: fallbackData,
-      source: 'structured_data',
       timestamp: new Date().toISOString()
-    });
+    }, { status: 503 });
     
   } catch (error) {
     console.error('Search API error:', error);
@@ -110,101 +108,7 @@ function extractDataFromHTML(html: string, query: string): any[] {
   return results;
 }
 
-// Get fallback data based on known current products
-async function getFallbackData(query: string): Promise<any[]> {
-  const queryLower = query.toLowerCase();
-  const results = [];
-  
-  // Current product database (as of 2024-2025)
-  const currentProducts = {
-    'iphone 16': {
-      price: '$799-$1,199',
-      processor: 'A18 / A18 Pro',
-      display: '6.1" to 6.9"',
-      released: 'September 2024',
-      current: true
-    },
-    'iphone 16 pro': {
-      price: '$999-$1,199',
-      processor: 'A18 Pro',
-      display: '6.3" / 6.9"',
-      camera: '48MP main',
-      released: 'September 2024',
-      current: true
-    },
-    'galaxy s24': {
-      price: '$799-$1,299',
-      processor: 'Snapdragon 8 Gen 3',
-      display: '6.2" to 6.8"',
-      released: 'January 2024',
-      current: true
-    },
-    'galaxy s24 ultra': {
-      price: '$1,299',
-      processor: 'Snapdragon 8 Gen 3',
-      display: '6.8"',
-      camera: '200MP main',
-      released: 'January 2024',
-      current: true
-    },
-    'pixel 9': {
-      price: '$799-$999',
-      processor: 'Tensor G4',
-      display: '6.3" / 6.8"',
-      released: 'October 2024',
-      current: true
-    },
-    'iphone 17': {
-      price: 'Not available',
-      processor: 'Not announced',
-      display: 'Not announced',
-      released: 'Expected September 2025',
-      current: false
-    },
-    'galaxy s25': {
-      price: 'Not available',
-      processor: 'Expected Snapdragon 8 Gen 4',
-      display: 'Not announced',
-      released: 'Expected January 2025',
-      current: false
-    }
-  };
-  
-  // Check which product is being queried
-  for (const [product, data] of Object.entries(currentProducts)) {
-    if (queryLower.includes(product)) {
-      results.push({
-        type: 'product_info',
-        name: product,
-        data,
-        confidence: data.current ? 0.95 : 0.3
-      });
-      
-      if (!data.current) {
-        // Suggest current alternative
-        const alternative = product.includes('iphone 17') ? 'iPhone 16' :
-                          product.includes('galaxy s25') ? 'Galaxy S24' :
-                          'current model';
-        results.push({
-          type: 'suggestion',
-          message: `${product} is not yet available. Latest model is ${alternative}`,
-          confidence: 1.0
-        });
-      }
-    }
-  }
-  
-  // If no specific product found, return general info
-  if (results.length === 0) {
-    results.push({
-      type: 'info',
-      message: 'Please specify a product model for accurate information',
-      confidence: 0.5
-    });
-  }
-  
-  return results;
-}
+// NO FALLBACK DATA - We only use REAL data or nothing!
 
 // GET endpoint for testing
 export async function GET(req: NextRequest) {

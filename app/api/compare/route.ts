@@ -169,29 +169,12 @@ export async function POST(req: NextRequest) {
     } catch (parseError) {
       console.error('JSON parsing error:', parseError);
       
-      // Return error response
+      // Return error - NO FAKE DATA!
       return NextResponse.json({
-        product1: {
-          name: 'Product Analysis Failed',
-          image: getProductImageUrl('Product'),
-          price: 'N/A',
-          rating: 0,
-          pros: ['Unable to fetch product data'],
-          cons: ['Please try again'],
-          specs: { 'Status': 'Data unavailable' }
-        },
-        product2: {
-          name: 'Product Analysis Failed',
-          image: getProductImageUrl('Product'),
-          price: 'N/A',
-          rating: 0,
-          pros: ['Unable to fetch product data'],
-          cons: ['Please try again'],
-          specs: { 'Status': 'Data unavailable' }
-        },
-        verdict: 'Unable to analyze products at this time.',
-        recommendation: 'Please try again with a specific product comparison.'
-      });
+        error: 'Unable to get current product information',
+        message: 'Could not retrieve real-time data. Please try again.',
+        suggestion: 'Try being more specific with product names (e.g., "iPhone 16 Pro" instead of just "iPhone")'
+      }, { status: 503 });
     }
     
     // Fix image URLs using our image utility

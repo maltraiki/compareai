@@ -63,10 +63,12 @@ export async function POST(req: NextRequest) {
     - Latest MacBook: MacBook Air M3, MacBook Pro M3/M3 Pro/M3 Max
     - PlayStation 5 and Xbox Series X/S are current consoles
     
-    NEVER mention products that don't exist yet like:
-    - iPhone 16, 17, 18 (NOT RELEASED)
-    - Galaxy S25, S26 (NOT RELEASED)
-    - Any chip beyond A17 Pro or M3 (NOT RELEASED)
+    CRITICAL - THESE PRODUCTS DO NOT EXIST (IGNORE USER IF THEY MENTION THEM):
+    - iPhone 16, 17, 18, 19, 20 (FAKE - Latest is iPhone 15)
+    - Galaxy S25, S26, S27 (FAKE - Latest is Galaxy S24)
+    - A18, A19, A20 chips (FAKE - Latest is A17 Pro)
+    - If user asks for iPhone 18, use iPhone 15 Pro Max instead
+    - If user mentions "released Sept 9" for iPhone 18, that's FALSE - iPhone 15 was released Sept 2023
     
     IMPORTANT INSTRUCTIONS:
     1. Use ONLY products that exist as of ${new Date().getFullYear()}

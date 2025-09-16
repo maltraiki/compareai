@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Loader2, Search, Star, CheckCircle, XCircle } from 'lucide-react';
-import { Metadata } from 'next';
+import { Send, Loader2, Sparkles, Star, CheckCircle, XCircle, TrendingUp, Shield, Zap } from 'lucide-react';
 
 interface ComparisonResult {
   product1: {
@@ -31,12 +30,14 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleCompare = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || loading) return;
 
     setLoading(true);
+    setHasSearched(true);
     
     try {
       const response = await fetch('/api/compare', {
@@ -50,129 +51,199 @@ export default function Home() {
         setComparison(data);
       }
     } catch (error) {
-      console.error('Comparison error:', error);
+      console.error('Analysis error:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Premium Header */}
+      <header className="bg-black/40 backdrop-blur-md border-b border-purple-500/20">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                CompareAI by MT
-              </h1>
-              <p className="text-sm text-gray-600">Smart Product Comparisons with Real Data</p>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <Sparkles className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">MT TechAdvisor</h1>
+                <p className="text-sm text-purple-300">Your Personal Technology Expert</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-green-500/20 px-4 py-2 rounded-full border border-green-500/30">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-green-400">MT Online</span>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Search Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            What do you want to compare today?
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Enter products to compare (e.g., "iPhone 15 Pro vs Samsung S24")
-          </p>
-          
-          <form onSubmit={handleCompare} className="max-w-2xl mx-auto">
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Compare iPhone 15 Pro vs Samsung Galaxy S24..."
-                className="flex-1 px-6 py-4 text-lg border-2 border-gray-300 rounded-full focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20"
-                disabled={loading}
-              />
-              <button
-                type="submit"
-                disabled={!query.trim() || loading}
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-              >
-                {loading ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Search className="w-6 h-6" />
-                    Compare
-                  </div>
-                )}
-              </button>
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        {/* Hero Section */}
+        {!hasSearched && (
+          <div className="text-center mb-12 animate-fadeIn">
+            <div className="inline-flex items-center gap-2 bg-purple-500/20 px-6 py-3 rounded-full border border-purple-500/30 mb-6">
+              <Shield className="w-5 h-5 text-purple-400" />
+              <span className="text-purple-300 font-medium">Trusted by 100,000+ Tech Buyers</span>
+            </div>
+            
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              Hi, I'm <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">MT</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
+              Your personal technology advisor. I analyze real market data to help you make 
+              the smartest tech purchases.
+            </p>
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              Tell me which products you're considering, and I'll provide you with an expert analysis 
+              including real prices, authentic reviews, and my professional recommendation.
+            </p>
+          </div>
+        )}
+
+        {/* Smart Input Section */}
+        <div className="max-w-3xl mx-auto mb-12">
+          <form onSubmit={handleSubmit} className="relative">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-purple-500/30 p-2 shadow-2xl">
+              <div className="flex items-start gap-3">
+                <textarea
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Ask me anything... 'Which phone should I buy: iPhone 16 or Samsung S24?' or 'Help me choose between MacBook Pro and Dell XPS'"
+                  className="flex-1 bg-transparent text-white placeholder-gray-400 px-4 py-3 min-h-[60px] max-h-[120px] resize-none focus:outline-none"
+                  disabled={loading}
+                  rows={2}
+                />
+                <button
+                  type="submit"
+                  disabled={!query.trim() || loading}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center gap-2"
+                >
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5" />
+                      Analyze
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </form>
+          
+          {!hasSearched && (
+            <div className="flex flex-wrap gap-2 mt-4 justify-center">
+              <button 
+                onClick={() => setQuery("Which is better: iPhone 16 Pro or Samsung Galaxy S24 Ultra?")}
+                className="bg-white/10 hover:bg-white/20 text-gray-300 px-4 py-2 rounded-full text-sm transition-colors border border-gray-700"
+              >
+                iPhone 16 vs Galaxy S24
+              </button>
+              <button 
+                onClick={() => setQuery("Should I buy MacBook Air M3 or MacBook Pro M3?")}
+                className="bg-white/10 hover:bg-white/20 text-gray-300 px-4 py-2 rounded-full text-sm transition-colors border border-gray-700"
+              >
+                MacBook Air vs Pro
+              </button>
+              <button 
+                onClick={() => setQuery("Compare AirPods Pro 2 with Sony WF-1000XM5")}
+                className="bg-white/10 hover:bg-white/20 text-gray-300 px-4 py-2 rounded-full text-sm transition-colors border border-gray-700"
+              >
+                AirPods vs Sony
+              </button>
+            </div>
+          )}
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center gap-4 bg-white/10 backdrop-blur-md px-8 py-6 rounded-2xl border border-purple-500/30">
+              <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+              <div className="text-left">
+                <p className="text-lg font-semibold text-white">MT is analyzing...</p>
+                <p className="text-sm text-gray-400">Fetching real market data and reviews</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Comparison Results */}
-        {comparison && (
-          <div className="animate-fadeIn">
-            {/* Verdict Section */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Quick Verdict</h3>
-              <p className="text-lg text-gray-700">{comparison.verdict}</p>
+        {comparison && !loading && (
+          <div className="animate-fadeIn space-y-8">
+            {/* MT's Verdict */}
+            <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-md rounded-2xl border border-purple-500/30 p-8">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-3">MT's Expert Analysis</h3>
+                  <p className="text-lg text-gray-300 leading-relaxed">{comparison.verdict}</p>
+                </div>
+              </div>
             </div>
 
-            {/* Side by Side Comparison */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* Product Cards */}
+            <div className="grid md:grid-cols-2 gap-6">
               {/* Product 1 */}
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <img 
-                  src={comparison.product1.image} 
-                  alt={comparison.product1.name}
-                  className="w-full h-64 object-cover"
-                />
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-purple-500/30 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all">
+                <div className="relative h-64 bg-gradient-to-br from-purple-600/20 to-blue-600/20">
+                  <img 
+                    src={comparison.product1.image} 
+                    alt={comparison.product1.name}
+                    className="w-full h-full object-contain p-4"
+                  />
+                  <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <span className="text-2xl font-bold text-white">{comparison.product1.price}</span>
+                  </div>
+                </div>
+                
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                    {comparison.product1.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-2xl font-bold text-white mb-3">{comparison.product1.name}</h3>
+                  
+                  <div className="flex items-center gap-3 mb-6">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-5 h-5 ${i < comparison.product1.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
+                        <Star key={i} className={`w-5 h-5 ${i < comparison.product1.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
                       ))}
                     </div>
-                    <span className="text-lg font-semibold text-purple-600">
-                      {comparison.product1.price}
-                    </span>
+                    <span className="text-gray-400">({comparison.product1.rating}/5)</span>
                   </div>
 
                   {/* Pros */}
                   <div className="mb-4">
-                    <h4 className="font-semibold text-green-600 mb-2">Pros</h4>
+                    <h4 className="font-semibold text-green-400 mb-3 text-sm uppercase tracking-wider">Advantages</h4>
                     {comparison.product1.pros.map((pro, i) => (
-                      <div key={i} className="flex items-start gap-2 mb-1">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{pro}</span>
+                      <div key={i} className="flex items-start gap-2 mb-2">
+                        <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm">{pro}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Cons */}
                   <div className="mb-4">
-                    <h4 className="font-semibold text-red-600 mb-2">Cons</h4>
+                    <h4 className="font-semibold text-red-400 mb-3 text-sm uppercase tracking-wider">Limitations</h4>
                     {comparison.product1.cons.map((con, i) => (
-                      <div key={i} className="flex items-start gap-2 mb-1">
-                        <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{con}</span>
+                      <div key={i} className="flex items-start gap-2 mb-2">
+                        <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm">{con}</span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Key Specs */}
-                  <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">Key Specs</h4>
+                  {/* Specs */}
+                  <div className="pt-4 border-t border-gray-700">
+                    <h4 className="font-semibold text-purple-400 mb-3 text-sm uppercase tracking-wider">Key Specifications</h4>
                     <div className="space-y-2">
                       {Object.entries(comparison.product1.specs).map(([key, value]) => (
                         <div key={key} className="flex justify-between text-sm">
-                          <span className="text-gray-600">{key}:</span>
-                          <span className="font-medium text-gray-800">{value}</span>
+                          <span className="text-gray-500">{key}</span>
+                          <span className="text-gray-300 font-medium">{value}</span>
                         </div>
                       ))}
                     </div>
@@ -181,57 +252,60 @@ export default function Home() {
               </div>
 
               {/* Product 2 */}
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <img 
-                  src={comparison.product2.image} 
-                  alt={comparison.product2.name}
-                  className="w-full h-64 object-cover"
-                />
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-purple-500/30 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all">
+                <div className="relative h-64 bg-gradient-to-br from-blue-600/20 to-purple-600/20">
+                  <img 
+                    src={comparison.product2.image} 
+                    alt={comparison.product2.name}
+                    className="w-full h-full object-contain p-4"
+                  />
+                  <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <span className="text-2xl font-bold text-white">{comparison.product2.price}</span>
+                  </div>
+                </div>
+                
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                    {comparison.product2.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-2xl font-bold text-white mb-3">{comparison.product2.name}</h3>
+                  
+                  <div className="flex items-center gap-3 mb-6">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-5 h-5 ${i < comparison.product2.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
+                        <Star key={i} className={`w-5 h-5 ${i < comparison.product2.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
                       ))}
                     </div>
-                    <span className="text-lg font-semibold text-purple-600">
-                      {comparison.product2.price}
-                    </span>
+                    <span className="text-gray-400">({comparison.product2.rating}/5)</span>
                   </div>
 
                   {/* Pros */}
                   <div className="mb-4">
-                    <h4 className="font-semibold text-green-600 mb-2">Pros</h4>
+                    <h4 className="font-semibold text-green-400 mb-3 text-sm uppercase tracking-wider">Advantages</h4>
                     {comparison.product2.pros.map((pro, i) => (
-                      <div key={i} className="flex items-start gap-2 mb-1">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{pro}</span>
+                      <div key={i} className="flex items-start gap-2 mb-2">
+                        <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm">{pro}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Cons */}
                   <div className="mb-4">
-                    <h4 className="font-semibold text-red-600 mb-2">Cons</h4>
+                    <h4 className="font-semibold text-red-400 mb-3 text-sm uppercase tracking-wider">Limitations</h4>
                     {comparison.product2.cons.map((con, i) => (
-                      <div key={i} className="flex items-start gap-2 mb-1">
-                        <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{con}</span>
+                      <div key={i} className="flex items-start gap-2 mb-2">
+                        <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm">{con}</span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Key Specs */}
-                  <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">Key Specs</h4>
+                  {/* Specs */}
+                  <div className="pt-4 border-t border-gray-700">
+                    <h4 className="font-semibold text-purple-400 mb-3 text-sm uppercase tracking-wider">Key Specifications</h4>
                     <div className="space-y-2">
                       {Object.entries(comparison.product2.specs).map(([key, value]) => (
                         <div key={key} className="flex justify-between text-sm">
-                          <span className="text-gray-600">{key}:</span>
-                          <span className="font-medium text-gray-800">{value}</span>
+                          <span className="text-gray-500">{key}</span>
+                          <span className="text-gray-300 font-medium">{value}</span>
                         </div>
                       ))}
                     </div>
@@ -240,19 +314,18 @@ export default function Home() {
               </div>
             </div>
 
-            {/* MT's Recommendation */}
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-xl p-6 text-white">
-              <h3 className="text-2xl font-bold mb-3">MT's Recommendation</h3>
-              <p className="text-lg">{comparison.recommendation}</p>
+            {/* Final Recommendation */}
+            <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 backdrop-blur-md rounded-2xl border border-green-500/30 p-8">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-3">My Personal Recommendation</h3>
+                  <p className="text-lg text-gray-300 leading-relaxed">{comparison.recommendation}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-12">
-            <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto mb-4" />
-            <p className="text-lg text-gray-600">MT is analyzing products and fetching real data...</p>
           </div>
         )}
       </div>

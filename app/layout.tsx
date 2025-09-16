@@ -5,21 +5,24 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CompareAI by MT - Smart Product Comparisons with Real Data",
+  title: "MT TechAdvisor - Smart Product Comparisons with Real Data",
   description: "Compare products instantly with AI-powered analysis. Get real photos, prices, specs, pros & cons. iPhone vs Samsung, MacBook vs Dell, AirPods vs Sony. Make smart buying decisions with MT's expert recommendations.",
-  keywords: "product comparison, compare products, iphone vs samsung, macbook vs dell, ipad vs surface, airpods vs sony, product reviews, tech comparison, shopping guide, best deals, MT compareai, smart shopping, price comparison",
+  keywords: "product comparison, compare products, iphone vs samsung, macbook vs dell, ipad vs surface, airpods vs sony, product reviews, tech comparison, shopping guide, best deals, MT TechAdvisor, smart shopping, price comparison",
   authors: [{ name: "MT" }],
+  icons: {
+    icon: '/icon.svg',
+  },
   openGraph: {
-    title: "CompareAI by MT - Smart Product Comparisons",
+    title: "MT TechAdvisor - Smart Product Comparisons",
     description: "Compare any products instantly with AI. Real photos, prices, and expert recommendations.",
     url: "https://compare-ai-fawn.vercel.app",
-    siteName: "CompareAI",
+    siteName: "MT TechAdvisor",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CompareAI by MT - Smart Product Comparisons",
+    title: "MT TechAdvisor - Smart Product Comparisons",
     description: "Compare any products instantly with AI-powered analysis",
   },
   robots: {

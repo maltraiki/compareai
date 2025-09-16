@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Send, Loader2, Sparkles, Star, CheckCircle, XCircle, TrendingUp, Shield, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Send, Loader2, Sparkles, Star, CheckCircle, XCircle, TrendingUp, Shield, Zap, Clock, Eye, Link2 } from 'lucide-react';
+import Link from 'next/link';
 
 interface ComparisonResult {
   product1: {
@@ -26,11 +27,47 @@ interface ComparisonResult {
   recommendation: string;
 }
 
+interface RecentComparison {
+  slug: string;
+  title: string;
+  product1: {
+    name: string;
+    image: string;
+    price: number;
+  };
+  product2: {
+    name: string;
+    image: string;
+    price: number;
+  };
+  viewCount: number;
+  createdAt: string;
+  lastViewed: string;
+}
+
 export default function Home() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [recentComparisons, setRecentComparisons] = useState<RecentComparison[]>([]);
+
+  // Fetch recent comparisons on mount
+  useEffect(() => {
+    fetchRecentComparisons();
+  }, []);
+
+  const fetchRecentComparisons = async () => {
+    try {
+      const response = await fetch('/api/comparisons/recent');
+      if (response.ok) {
+        const data = await response.json();
+        setRecentComparisons(data.comparisons || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent comparisons:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +86,8 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json();
         setComparison(data);
+        // Refresh recent comparisons after new comparison
+        fetchRecentComparisons();
       }
     } catch (error) {
       console.error('Analysis error:', error);
@@ -195,7 +234,7 @@ export default function Home() {
                   <img 
                     src={comparison.product1.image} 
                     alt={comparison.product1.name}
-                    className="w-full h-full object-contain p-4"
+                    className="w-full h-full object-contain p-4 pointer-events-none select-none"
                   />
                   <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full">
                     <span className="text-2xl font-bold text-white">{comparison.product1.price}</span>
@@ -257,7 +296,7 @@ export default function Home() {
                   <img 
                     src={comparison.product2.image} 
                     alt={comparison.product2.name}
-                    className="w-full h-full object-contain p-4"
+                    className="w-full h-full object-contain p-4 pointer-events-none select-none"
                   />
                   <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full">
                     <span className="text-2xl font-bold text-white">{comparison.product2.price}</span>
@@ -325,6 +364,82 @@ export default function Home() {
                   <p className="text-lg text-gray-300 leading-relaxed">{comparison.recommendation}</p>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Comparisons Section */}
+        {recentComparisons.length > 0 && (
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-2">Previous Comparisons</h2>
+              <p className="text-gray-400">Quick access to recent product comparisons</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recentComparisons.map((comp) => (
+                <Link 
+                  key={comp.slug}
+                  href={`/compare/${comp.slug}`}
+                  className="group bg-white/10 backdrop-blur-md rounded-xl border border-purple-500/30 p-4 hover:bg-white/20 hover:shadow-xl hover:shadow-purple-500/20 transition-all"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-white font-semibold text-sm line-clamp-2 flex-1">
+                      {comp.title}
+                    </h3>
+                    <Link2 className="w-4 h-4 text-purple-400 ml-2 group-hover:text-purple-300" />
+                  </div>
+                  
+                  <div className="flex gap-2 mb-3">
+                    <div className="flex-1">
+                      <div className="h-16 bg-gradient-to-br from-purple-600/10 to-blue-600/10 rounded-lg flex items-center justify-center overflow-hidden">
+                        {comp.product1.image ? (
+                          <img 
+                            src={comp.product1.image} 
+                            alt={comp.product1.name}
+                            className="h-12 w-12 object-contain"
+                          />
+                        ) : (
+                          <div className="text-xs text-gray-500">{comp.product1.name}</div>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 line-clamp-1">{comp.product1.name}</p>
+                      <p className="text-xs text-purple-400 font-semibold">${comp.product1.price}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-center px-2">
+                      <span className="text-gray-500 text-xs font-semibold">VS</span>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="h-16 bg-gradient-to-br from-blue-600/10 to-purple-600/10 rounded-lg flex items-center justify-center overflow-hidden">
+                        {comp.product2.image ? (
+                          <img 
+                            src={comp.product2.image} 
+                            alt={comp.product2.name}
+                            className="h-12 w-12 object-contain"
+                          />
+                        ) : (
+                          <div className="text-xs text-gray-500">{comp.product2.name}</div>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 line-clamp-1">{comp.product2.name}</p>
+                      <p className="text-xs text-purple-400 font-semibold">${comp.product2.price}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      <span>{comp.viewCount} views</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{new Date(comp.lastViewed).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         )}

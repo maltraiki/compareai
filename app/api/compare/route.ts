@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { geminiModel } from '@/lib/gemini';
+import { prisma } from '@/lib/prisma';
+import { generateComparisonSlug, jsonStringify } from '@/lib/utils';
+import { searchProductImage, searchProductPrice } from '@/lib/product-search';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,22 +15,29 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Enhanced prompt for MT to also suggest image searches
-    const prompt = `You are MT, a highly experienced personal technology advisor with deep knowledge of the latest tech products and their official product images.
+    // Enhanced prompt for MT with better instructions for real data
+    const prompt = `You are MT, a highly experienced personal technology advisor with deep knowledge of the latest tech products, their real market prices, and availability.
     
     User Query: "${query}"
     
     Analyze this query and provide a detailed comparison. If the user mentions specific products, compare those. 
     If they ask general questions, identify the two best options to compare.
     
+    IMPORTANT INSTRUCTIONS:
+    1. Use REAL, CURRENT market prices in SAR (Saudi Riyals) when possible
+    2. Check prices from retailers like Amazon.sa, Noon.com, Jarir.com, Extra.com
+    3. For images, search for actual product images from official sources
+    4. Include ACCURATE technical specifications from 2024/2025
+    5. Provide genuine pros and cons based on real user reviews
+    
     IMPORTANT: Provide ONLY valid JSON in this exact format with realistic, current market data.
-    For images, provide the EXACT official product image URL from the manufacturer's website or a reliable source:
+    For prices, use actual Saudi Arabian market prices (SAR):
     
     {
       "product1": {
         "name": "Exact product name with model",
-        "image": "https://... (actual product image URL or manufacturer website image)",
-        "price": "$X,XXX",
+        "image": "https://... (search for actual product image from official sources)",
+        "price": "SAR X,XXX",
         "rating": 4.5,
         "pros": [
           "Specific advantage 1 with details",
@@ -49,8 +59,8 @@ export async function POST(req: NextRequest) {
       },
       "product2": {
         "name": "Exact product name with model",
-        "image": "https://... (actual product image URL or manufacturer website image)",
-        "price": "$X,XXX",
+        "image": "https://... (search for actual product image from official sources)",
+        "price": "SAR X,XXX",
         "rating": 4.3,
         "pros": [
           "Specific advantage 1 with details",
@@ -74,14 +84,19 @@ export async function POST(req: NextRequest) {
       "recommendation": "As your technology advisor, here's my personalized recommendation based on different use cases and user needs (3-4 sentences)"
     }
     
-    For the image field, provide actual product image URLs. Some reliable sources:
-    - Apple products: Use images from apple.com
-    - Samsung products: Use images from samsung.com
-    - Google products: Use images from store.google.com
-    - Dell products: Use images from dell.com
-    - Sony products: Use images from sony.com
+    For prices, search these Saudi retailers in order of preference:
+    - Amazon.sa (usually has competitive prices and wide selection)
+    - Noon.com (local favorite with good deals)
+    - Jarir.com (Jarir Bookstore - trusted for electronics)
+    - Extra.com (Extra Stores - major electronics retailer)
     
-    If you cannot find the exact manufacturer URL, use a high-quality product image from a reputable tech site.
+    For the image field, search for actual product images from:
+    - Official manufacturer websites (Apple.com, Samsung.com, etc.)
+    - Amazon.sa product listings
+    - Noon.com product pages
+    - Official press images
+    
+    ALWAYS provide prices in SAR (Saudi Riyals) format.
     
     Use real, current market data. Be specific with model numbers, exact specifications, and actual prices.
     Provide ONLY the JSON, no markdown, no explanation, no text before or after.`;
@@ -136,58 +151,120 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Validate and fix image URLs if needed
-    // If the AI didn't provide valid image URLs, use fallback images based on product name
+    // Use the product search utility for better image URLs
     if (!comparisonData.product1.image || !comparisonData.product1.image.startsWith('http')) {
-      // Generate fallback based on product name
-      const product1Name = comparisonData.product1.name.toLowerCase();
-      if (product1Name.includes('iphone')) {
-        comparisonData.product1.image = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=800&hei=600&fmt=jpeg&qlt=90';
-      } else if (product1Name.includes('samsung') || product1Name.includes('galaxy')) {
-        comparisonData.product1.image = 'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-s928-sm-s928bzkcmea-thumb-539305789?$800_800_PNG$';
-      } else if (product1Name.includes('macbook')) {
-        comparisonData.product1.image = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-midnight-select-20220606?wid=800&hei=600&fmt=jpeg&qlt=90';
-      } else if (product1Name.includes('dell') || product1Name.includes('xps')) {
-        comparisonData.product1.image = 'https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/xps-notebooks/13-9315/media-gallery/notebook-xps-13-9315-gray-gallery-3.psd?fmt=png-alpha&pscan=auto&scl=1&hei=600&wid=800';
-      } else if (product1Name.includes('pixel')) {
-        comparisonData.product1.image = 'https://lh3.googleusercontent.com/H6dMPybfzUccvpGcHZ0g1TmJPLh0IsD7cy9zWXJqnRk0XL9zWY6FR6h8NBQqF8g6OKc5usxVOSm7cZJJDBLWX0yZN7sKQfCO2A=rw-e365-w800-h600';
-      } else if (product1Name.includes('airpods')) {
-        comparisonData.product1.image = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-pro-2-hero-select-202409?wid=800&hei=600&fmt=jpeg&qlt=90';
-      } else if (product1Name.includes('sony')) {
-        comparisonData.product1.image = 'https://www.sony.com/image/5d02da5df552836db894cead8a68f5f3?fmt=pjpeg&wid=800&hei=600';
-      } else {
-        comparisonData.product1.image = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop';
-      }
+      comparisonData.product1.image = await searchProductImage(comparisonData.product1.name);
     }
 
     if (!comparisonData.product2.image || !comparisonData.product2.image.startsWith('http')) {
-      // Generate fallback based on product name
-      const product2Name = comparisonData.product2.name.toLowerCase();
-      if (product2Name.includes('iphone')) {
-        comparisonData.product2.image = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=800&hei=600&fmt=jpeg&qlt=90';
-      } else if (product2Name.includes('samsung') || product2Name.includes('galaxy')) {
-        comparisonData.product2.image = 'https://images.samsung.com/is/image/samsung/p6pim/levant/2401/gallery/levant-galaxy-s24-ultra-s928-sm-s928bzkcmea-thumb-539305789?$800_800_PNG$';
-      } else if (product2Name.includes('macbook')) {
-        comparisonData.product2.image = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-space-gray-select-20220606?wid=800&hei=600&fmt=jpeg&qlt=90';
-      } else if (product2Name.includes('dell') || product2Name.includes('xps')) {
-        comparisonData.product2.image = 'https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/xps-notebooks/xps-15-9530/media-gallery/notebook-xps-15-9530-gray-gallery-3.psd?fmt=png-alpha&pscan=auto&scl=1&hei=600&wid=800';
-      } else if (product2Name.includes('pixel')) {
-        comparisonData.product2.image = 'https://lh3.googleusercontent.com/KJrGx0suUU8xQQYH3kdjKg-FuGPWaHmJquU8TyYBPvGJYZ9nPMgKQW8e8g6nMQ35Y5RBQ6OuRHZhPBhkWt6H1vqPeWwHh5mbow=rw-e365-w800-h600';
-      } else if (product2Name.includes('airpods')) {
-        comparisonData.product2.image = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-3-witb-202110?wid=800&hei=600&fmt=jpeg&qlt=90';
-      } else if (product2Name.includes('sony')) {
-        comparisonData.product2.image = 'https://www.sony.com/image/aeed6e8bf7e2d4f3ea09c57e4ac990f9?fmt=pjpeg&wid=800&hei=600';
-      } else {
-        comparisonData.product2.image = 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&h=600&fit=crop';
+      comparisonData.product2.image = await searchProductImage(comparisonData.product2.name);
+    }
+
+    // Ensure prices are properly formatted (handle both $ and SAR)
+    if (comparisonData.product1.price) {
+      const price1 = comparisonData.product1.price;
+      if (!price1.startsWith('$') && !price1.startsWith('SAR')) {
+        comparisonData.product1.price = 'SAR ' + price1;
+      }
+    }
+    if (comparisonData.product2.price) {
+      const price2 = comparisonData.product2.price;
+      if (!price2.startsWith('$') && !price2.startsWith('SAR')) {
+        comparisonData.product2.price = 'SAR ' + price2;
       }
     }
 
-    // Ensure prices are properly formatted
-    if (comparisonData.product1.price && !comparisonData.product1.price.startsWith('$')) {
-      comparisonData.product1.price = '$' + comparisonData.product1.price;
-    }
-    if (comparisonData.product2.price && !comparisonData.product2.price.startsWith('$')) {
-      comparisonData.product2.price = '$' + comparisonData.product2.price;
+    // Save comparison to database for SEO landing page
+    try {
+      const slug = generateComparisonSlug(comparisonData.product1.name, comparisonData.product2.name);
+      
+      // Check if comparison already exists
+      const existingComparison = await prisma.comparison.findUnique({
+        where: { slug }
+      });
+
+      if (!existingComparison) {
+        // Create products if they don't exist
+        const [product1, product2] = await Promise.all([
+          prisma.product.upsert({
+            where: { slug: generateComparisonSlug(comparisonData.product1.name, '') },
+            update: {
+              name: comparisonData.product1.name,
+              currentPrice: parseFloat(comparisonData.product1.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              images: jsonStringify([comparisonData.product1.image]),
+              specifications: jsonStringify(comparisonData.product1.specs),
+              pros: jsonStringify(comparisonData.product1.pros),
+              cons: jsonStringify(comparisonData.product1.cons),
+            },
+            create: {
+              name: comparisonData.product1.name,
+              brand: comparisonData.product1.name.split(' ')[0],
+              category: 'Technology',
+              slug: generateComparisonSlug(comparisonData.product1.name, ''),
+              currentPrice: parseFloat(comparisonData.product1.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              images: jsonStringify([comparisonData.product1.image]),
+              specifications: jsonStringify(comparisonData.product1.specs),
+              pros: jsonStringify(comparisonData.product1.pros),
+              cons: jsonStringify(comparisonData.product1.cons),
+              description: `${comparisonData.product1.name} - ${comparisonData.verdict}`,
+            }
+          }),
+          prisma.product.upsert({
+            where: { slug: generateComparisonSlug(comparisonData.product2.name, '') },
+            update: {
+              name: comparisonData.product2.name,
+              currentPrice: parseFloat(comparisonData.product2.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              images: jsonStringify([comparisonData.product2.image]),
+              specifications: jsonStringify(comparisonData.product2.specs),
+              pros: jsonStringify(comparisonData.product2.pros),
+              cons: jsonStringify(comparisonData.product2.cons),
+            },
+            create: {
+              name: comparisonData.product2.name,
+              brand: comparisonData.product2.name.split(' ')[0],
+              category: 'Technology',
+              slug: generateComparisonSlug(comparisonData.product2.name, ''),
+              currentPrice: parseFloat(comparisonData.product2.price.replace('SAR', '').replace('$', '').replace(',', '').trim()),
+              images: jsonStringify([comparisonData.product2.image]),
+              specifications: jsonStringify(comparisonData.product2.specs),
+              pros: jsonStringify(comparisonData.product2.pros),
+              cons: jsonStringify(comparisonData.product2.cons),
+              description: `${comparisonData.product2.name} - ${comparisonData.verdict}`,
+            }
+          })
+        ]);
+
+        // Create comparison
+        await prisma.comparison.create({
+          data: {
+            slug,
+            title: `${comparisonData.product1.name} vs ${comparisonData.product2.name}`,
+            product1Id: product1.id,
+            product2Id: product2.id,
+            seoContent: `${comparisonData.verdict} ${comparisonData.recommendation}`,
+            conversation: jsonStringify({
+              query,
+              verdict: comparisonData.verdict,
+              recommendation: comparisonData.recommendation
+            })
+          }
+        });
+      } else {
+        // Update view count
+        await prisma.comparison.update({
+          where: { slug },
+          data: { 
+            viewCount: { increment: 1 },
+            lastViewed: new Date()
+          }
+        });
+      }
+
+      // Add the slug to response for frontend
+      comparisonData.slug = slug;
+    } catch (dbError) {
+      console.error('Database save error:', dbError);
+      // Continue even if database save fails
     }
 
     return NextResponse.json(comparisonData);

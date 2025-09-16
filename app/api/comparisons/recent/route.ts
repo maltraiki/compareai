@@ -19,8 +19,8 @@ export async function GET() {
 
     // Format the comparisons for the frontend
     const formattedComparisons = comparisons.map(comp => {
-      const product1Images = safeJsonParse(comp.product1.images, []);
-      const product2Images = safeJsonParse(comp.product2.images, []);
+      const product1Images = safeJsonParse(comp.product1.images as any, []);
+      const product2Images = safeJsonParse(comp.product2.images as any, []);
       
       return {
         slug: comp.slug,

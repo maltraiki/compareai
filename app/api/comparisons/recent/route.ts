@@ -4,7 +4,7 @@ import { safeJsonParse } from '@/lib/utils';
 
 export async function GET() {
   try {
-    // Get the 10 most recent comparisons
+    // Get the 10 most recent comparisons from database
     const comparisons = await prisma.comparison.findMany({
       take: 10,
       orderBy: [

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Get user location and currency
-    const country = req.headers.get('x-vercel-ip-country') || req.geo?.country || 'US';
+    const country = req.headers.get('x-vercel-ip-country') || 'US';
     
     // Determine currency and retailers based on location
     const locationConfig: { [key: string]: { currency: string, retailers: string[] } } = {

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   // Get location from request headers
-  const country = req.headers.get('x-vercel-ip-country') || req.geo?.country || 'US';
-  const city = req.headers.get('x-vercel-ip-city') || req.geo?.city || '';
+  const country = req.headers.get('x-vercel-ip-country') || 'US';
+  const city = req.headers.get('x-vercel-ip-city') || '';
   
   // Determine currency based on country
   const currencyMap: { [key: string]: { symbol: string, code: string, retailers: string[] } } = {
